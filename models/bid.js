@@ -9,6 +9,8 @@ const driver_id = Driver.ObjectId;
 
 const bid_Schema = mongoose.Schema({
   userID: user_id,
+  placed_time: { type: Date, require: true },
+  bid_value: { type: Number, require: true },
   description: { type: String, require: true },
   photo: [URL],
   due_time: { type: Date },
@@ -21,6 +23,9 @@ const bid_Schema = mongoose.Schema({
     type: "Point",
     coordinates: [{ lon: { type: float } }, { lon: { type: float } }] //syntax ?
   },
+
+  bids: [{ driver: driver_id, placed_value: Number, placed_time: Date }],
+
   driver: driver_id //accepted driver
 });
 
