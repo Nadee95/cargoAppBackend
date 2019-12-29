@@ -19,7 +19,8 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  role: [{ type: String }]
+  role: { type: Number, default: 0 },
+  dateRegistered: { type: Date, default: Date.now }
 });
 
 const User = (module.exports = mongoose.model("User", userSchema));
@@ -27,6 +28,14 @@ const User = (module.exports = mongoose.model("User", userSchema));
 module.exports.getUserById = function(id, callback) {
   User.findById(id, callback);
 };
+
+module.exports.checkEmail = function(query) {
+  return User.findOne(query);
+};
+module.exports.checkPassword = function(reqPass, pass) {
+  return bcrypt.compare(reqPass, pass);
+};
+
 module.exports.getUserByUsername = function(username, callback) {
   const query = { username: username };
   User.findOne(query, callback);
@@ -40,6 +49,7 @@ module.exports.addUser = function(newUser, callback) {
       newUser.save(callback);
     });
   });
+  return newUser;
 };
 
 module.exports.comparePassword = function(candidatePassword, hash, callback) {

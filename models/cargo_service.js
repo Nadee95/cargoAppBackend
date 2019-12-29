@@ -4,9 +4,10 @@ const User = require("../models/user");
 const Driver = require("../models/driver");
 const Vehicle = require("../models/vehicle");
 
-const user_id = User.ObjectId;
-const driver_id = Driver.ObjectId;
-const vehicle_id = Vehicle.ObjectId;
+//const user_id = User.ObjectId;
+//const driver_id = Driver.ObjectId;
+//const vehicle_id = Vehicle.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const cargo_serviceSchema = mongoose.Schema({
   service_name: {
@@ -16,9 +17,9 @@ const cargo_serviceSchema = mongoose.Schema({
   },
   email: { type: String, required: true }, //another user type therefore can replace user2 id
   phone_no: [{ type: Number, required: true }],
-  created_date: { type: Date }, // set to auto
-  employees: [Driver.ObjectId],
-  vehicles: [vehicle_id.ObjectId]
+  created_date: { type: Date, default: Date.now }, // set to auto
+  employees: ObjectId,
+  vehicles: ObjectId
   //photo or logo if needed
 });
 

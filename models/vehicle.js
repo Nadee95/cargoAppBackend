@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const config = require("../config/database");
-
+const GeoJSON = require("mongoose-geojson-schema");
 const Cargo_service = require("../models/cargo_service");
 
-const cargo_service_id = Cargo_service.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const vehicleSchema = mongoose.Schema({
   vehicle_no: {
@@ -19,10 +19,10 @@ const vehicleSchema = mongoose.Schema({
   photo: URL,
   max_volume: { type: Float, required: true },
   max_weight: { type: Float, required: true },
-  cargo_service: cargo_service_id,
+  cargo_service: ObjectId,
   location: {
-    type: "Point",
-    coordinates: [{ lon: { type: float } }, { lon: { type: float } }] //syntax ?
+    type: mongoose.Schema.Types.Point,
+    coordinates: [{ lon: { type: Number } }, { lon: { type: Number } }] //syntax ?
   }
 });
 //cargo service ?

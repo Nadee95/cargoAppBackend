@@ -8,15 +8,18 @@
     "start": "node app"
   },
   "dependencies": {
-    "express": "*",
-    "mongoose": "*",
+    "@hapi/joi": "^16.1.8",
     "bcryptjs": "*",
-    "cors": "*",
-    "jsonwebtoken": "*",
     "body-parser": "*",
+    "cors": "*",
+    "dotenv": "^8.2.0",
+    "express": "*",
+    "jsonwebtoken": "*",
+    "mongoose": "*",
+    "mongoose-geojson-schema": "^2.1.5",
     "passport": "*",
     "passport-jwt": "*"
   },
   "author": "Nadeeka",
-  "license": "MIT"
+  "license": "ISC"
 }
