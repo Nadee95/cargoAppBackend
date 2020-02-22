@@ -4,7 +4,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { registerValidation, loginValidation } = require("../validation");
 
-const verify = require("./routes/verifyToken");
+//const verify = require("./routes/verifyToken");
 
 const User = require("../models/user");
 const config = require("../config/database");
