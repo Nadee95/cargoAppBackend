@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  img: { data: Buffer, contentType: String },
+  imgURL: { url: String, filename: String },
   role: { type: Number, default: 0 },
   dateRegistered: { type: Date, default: Date.now }
 });

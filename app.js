@@ -1,3 +1,5 @@
+const multer = require("multer");
+
 const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
@@ -27,7 +29,25 @@ mongoose.connection.on("error", err => {
 const app = express();
 
 //port number
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
+exports.PORT = PORT;
+
+//image upload path
+// const UPLOAD_PATH = "uploads";
+// exports.UPLOAD_PATH = UPLOAD_PATH;
+
+// var storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, UPLOAD_PATH);
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, req.body._id + "-" + Date.now());
+//   }
+// });
+
+// let upload = multer({ storage: storage });
+// exports.upload = upload;
+
 
 //CORS Middleware
 app.use(cors());
@@ -36,8 +56,8 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
 //body parser Middleware
-app.use(bodyParser.json());
-
+app.use(bodyParser.json({}));
+app.use(bodyParser.urlencoded({ extended: true }));
 //Passport Middleware
 app.use(passport.initialize());
 app.use(passport.session());
@@ -52,6 +72,6 @@ app.get("/", (req, res) => {
   res.send("invalid End Point");
 });
 
-app.listen(port, () => {
-  console.log("server started on port:" + port);
+app.listen(PORT, () => {
+  console.log("server started on port:" + PORT);
 });

@@ -3,11 +3,15 @@ const router = express.Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { registerValidation, loginValidation } = require("../validation");
-
-//const verify = require("./routes/verifyToken");
+const app = require("../app");
+//  const verify = require("./routes/verifyToken");
 
 const User = require("../models/user");
 const config = require("../config/database");
+const multer = require("multer");
+const fs = require("fs");
+const del = require("del");
+const path = require("path");
 
 //Register
 router.post("/register", async (req, res, next) => {
@@ -48,7 +52,7 @@ router.get(
   }
 );
 
-//login => authenticate
+//login => authenticate //using....
 router.post("/login", async (req, res, next) => {
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -120,7 +124,7 @@ router.post("/authenticate", (req, res, next) => {
 
 //getAll users
 router.get("/allUsers", (req, res, next) => {
-  User.find((error, users) => {
+  User.find({}, '-__v -password', (error, users) => {
     if (error) {
       return next(error);
     } else {
@@ -131,7 +135,7 @@ router.get("/allUsers", (req, res, next) => {
 
 // get drivers
 router.get("/allDrivers", (req, res, next) => {
-  User.find({ role: "1" }, (error, users) => {
+  User.find({ role: "1" }, '-__v -password', (error, users) => {
     if (error) {
       return next(error);
     } else {
@@ -170,6 +174,85 @@ router.put("/addDriver", async (req, res, next) => {
         message: "Error updating user with id " + req.body._Id
       });
     });
+});
+
+//image crud functions
+
+const UPLOAD_PATH = "uploads/";
+// exports.UPLOAD_PATH = UPLOAD_PATH;
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, UPLOAD_PATH);
+  },
+  filename: function (req, file, cb) {
+    cb(null, req.body._Id + "-" + Date.now() + path.extname(file.originalname));
+  }
+});
+
+let upload = multer({ storage: storage });
+// exports.upload = upload;
+
+router.post("/dpImage", upload.single('image'), (req, res, next) => {
+  console.log("received ", req.body._Id);
+  let url = req.protocol + "://" + req.get("host") + "/users/dpImage/" + req.body._Id;
+  User.findByIdAndUpdate(req.body._Id, { imgURL: { url: url, filename: req.file.filename } }, { new: true })
+    .then(updatedUser => {
+      if (!updatedUser) {
+        return res.status(404).send({
+          message: "user not found with id " + req.body._Id
+        });
+      }
+      res.send(updatedUser);//should not send
+    })
+    .catch(err => {
+      if (err.kind === "ObjectId") {
+        return res.status(404).send({
+          message: "user not found with id " + req.body._Id
+        });
+      }
+      return res.status(500).send({
+        message: "Error updating user with id " + req.body._Id
+      });
+    });
+});
+
+router.get("/dpImage/:_Id", (req, res, next) => {
+
+
+  User.findById(req.params._Id, (err, user) => {
+    if (err) {
+      return res.status(404).send({
+        message: "user not found with id " + req.params._Id
+      });
+    }
+    if (user) {
+      res.setHeader('Content-Type', 'image/jpeg');
+      fs.createReadStream(path.join(UPLOAD_PATH, user.imgURL.filename)).pipe(res);
+    }
+  });
+});
+
+router.delete("/dpImage/:_Id", (req, res, next) => {
+  User.findByIdAndRemove(req.params._Id, (err, user) => {
+    if (err) {
+      return res.status(404).send({
+        message: "user not found with id " + req.params._Id
+      });
+    }
+    if (user) {
+      del([path.join(UPLOAD_PATH, user.imgURL.filename)]).then(deleted => {
+        return res.status(200).send({
+          message: "image deleted!"
+        });
+      });
+    } else {
+      return res.status(404).send({
+        message: "image not found with id " + req.params._Id
+      });
+    }
+
+  });
 });
 
 module.exports = router;
