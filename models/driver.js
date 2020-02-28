@@ -13,4 +13,10 @@ const driverSchema = mongoose.Schema({
   //rating
 });
 
+// module.exports.addDriver = function (newDriver, callback) {
+//   console.log(newDriver);
+//   newDriver.save(callback)
+//   return newDriver;
+// };
+
 const Driver = (module.exports = mongoose.model("Driver", driverSchema));

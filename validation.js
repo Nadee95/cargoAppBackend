@@ -1,5 +1,6 @@
 const joi = require("@hapi/joi");
 
+
 const registerValidation = data => {
   const schema = joi.object({
     name: joi
@@ -48,6 +49,7 @@ const loginValidation = data => {
 
 const cargoRequestValidation = data => {
   const schema = joi.object({
+    user_id: joi.any(),
     cargo_type: joi
       .string()
       .min(2)
@@ -57,8 +59,12 @@ const cargoRequestValidation = data => {
       .string()
       .min(1)
       .required(),
+    weight: joi
+      .string()
+      .min(1)
+      .required(),
 
-    on_time: joi.date().required(),
+    on_time: joi.date(),
 
     due_time: joi.date().required(),
     user_location: joi.any(),

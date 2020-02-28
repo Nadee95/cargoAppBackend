@@ -1,5 +1,5 @@
 const multer = require("multer");
-
+const formData = require("express-form-data");
 const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
@@ -17,7 +17,7 @@ const transport_request = require("./routes/Transport_request");
 const verify = require("./routes/verifyToken");
 
 //connect to db
-mongoose.connect(config.database, { useNewUrlParser: true });
+mongoose.connect(config.database, { useNewUrlParser: true, useFindAndModify: false });
 mongoose.connection.on("connected", () => {
   console.log("Connected to database " + config.database);
 });
@@ -61,6 +61,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //Passport Middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
+
 
 require("./config/passport")(passport);
 

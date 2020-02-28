@@ -11,15 +11,16 @@ const transport_requestSchema = mongoose.Schema({
   user_id: ObjectId,
   cargo_type: { type: String, require: true },
   volume: { type: String, require: true },
+  weight: { type: String, require: true },
   on_time: { type: Date, require: true, default: Date.now },
   due_time: { type: Date, require: true },
   user_location: {
-    type: mongoose.Schema.Types.Point,
-    coordinates: [{ lon: { type: Number } }, { lon: { type: Number } }] //syntax ?
+    //type: mongoose.Schema.Types.Point,
+    coordinates: [{ lat: { type: Number } }, { lon: { type: Number } }] //syntax ?
   },
   destination: {
-    type: mongoose.Schema.Types.Point,
-    coordinates: [{ lon: { type: Number } }, { lon: { type: Number } }] //syntax ?
+    //type: mongoose.Schema.Types.Point,
+    coordinates: [{ lat: { type: Number } }, { lon: { type: Number } }] //syntax ?
   },
   driver_id: ObjectId
 });
@@ -29,6 +30,6 @@ const Transport_request = (module.exports = mongoose.model(
   transport_requestSchema
 ));
 
-module.exports.getTransportRequestById = function(id, callback) {
+module.exports.getTransportRequestById = function (id, callback) {
   User.findById(id, callback);
 };

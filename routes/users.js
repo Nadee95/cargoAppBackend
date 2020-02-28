@@ -4,6 +4,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { registerValidation, loginValidation } = require("../validation");
 const app = require("../app");
+const Driver = require("../models/driver");
 //  const verify = require("./routes/verifyToken");
 
 const User = require("../models/user");
@@ -64,10 +65,10 @@ router.post("/login", async (req, res, next) => {
   if (!validPass) return res.status(400).send("Invalid password.");
 
   const token = jwt.sign(
-    { _id: user._id, email: user.email },
+    { _id: user._id, email: user.email, name: user.name, username: user.username, phone: user.phone, role: user.role, imgURL: user.imgURL.url },
     process.env.SECRET_KEY,
     {
-      expiresIn: 604800
+      expiresIn: 6048000
     }
   );
   try {
@@ -133,6 +134,20 @@ router.get("/allUsers", (req, res, next) => {
   });
 });
 
+
+
+//get user detail
+
+router.get("/:_id", (req, res, next) => {
+  User.findById(req.params._id, '-__v -password', (error, user) => {
+    if (error) {
+      return next(error);
+    } else {
+      res.status(200).send(user);
+    }
+  });
+});
+
 // get drivers
 router.get("/allDrivers", (req, res, next) => {
   User.find({ role: "1" }, '-__v -password', (error, users) => {
@@ -143,43 +158,53 @@ router.get("/allDrivers", (req, res, next) => {
     }
   });
 });
-//
 
 //add driver
 router.put("/addDriver", async (req, res, next) => {
-  // const user = await User.findOne({ email: req.body.email });
-  // if (!user) return res.status(400).send("email is not found.");
+
+  User.findByIdAndUpdate(req.body._id, { role: 1 }, (err, user) => {
+    if (err) {
+      res.json({
+        success: false,
+        msg: "Fail to register Driver."
+      });
+      console.log(err);
+    } else {
+      console.log(user);
+    }
+  });
+
   console.log(req.body._id);
   if (!req.body._id) {
     return res.status(400).send({
-      message: "Note content can not be empty"
+      message: " content can not be empty"
     });
   }
-  User.findByIdAndUpdate(req.body._id, { role: "1" }, { new: true })
-    .then(updatedUser => {
-      if (!updatedUser) {
-        return res.status(404).send({
-          message: "user not found with id " + req.body._Id
-        });
-      }
-      res.send(updatedUser);
-    })
-    .catch(err => {
-      if (err.kind === "ObjectId") {
-        return res.status(404).send({
-          message: "user not found with id " + req.body._Id
-        });
-      }
-      return res.status(500).send({
-        message: "Error updating user with id " + req.body._Id
+
+  let newDriver = new Driver({
+    user_Id: req.body._id,
+    licence_no: req.body.licence_no,
+    age: req.body.age
+  });
+
+  newDriver.save((err) => {
+    if (err) {
+      res.json({
+        success: false,
+        msg: "Fail to register Driver."
       });
-    });
+    } else {
+      res.send({ success: true, msg: "Driver registered.", newDriver }); //filtr user obj
+    }
+
+  });
+
 });
+
 
 //image crud functions
 
 const UPLOAD_PATH = "uploads/";
-// exports.UPLOAD_PATH = UPLOAD_PATH;
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -191,7 +216,6 @@ var storage = multer.diskStorage({
 });
 
 let upload = multer({ storage: storage });
-// exports.upload = upload;
 
 router.post("/dpImage", upload.single('image'), (req, res, next) => {
   console.log("received ", req.body._Id);
@@ -222,13 +246,46 @@ router.get("/dpImage/:_Id", (req, res, next) => {
 
   User.findById(req.params._Id, (err, user) => {
     if (err) {
-      return res.status(404).send({
-        message: "user not found with id " + req.params._Id
-      });
+      return res.status(404).send(err);
     }
     if (user) {
       res.setHeader('Content-Type', 'image/jpeg');
       fs.createReadStream(path.join(UPLOAD_PATH, user.imgURL.filename)).pipe(res);
+    }
+  });
+});
+//upload frombrowser
+router.post("/dpImage/frombrowser", upload.single('image'), (req, res, next) => {
+  console.log("received ", req._Id);
+  let url = req.protocol + "://" + req.get("host") + "/users/dpImage/" + req._Id;
+  User.findByIdAndUpdate(req._Id, { imgURL: { url: url, filename: req.filename } }, { new: true })
+    .then(updatedUser => {
+      if (!updatedUser) {
+        return res.status(404).send({
+          message: "user not found with id " + req._Id
+        });
+      }
+      res.send(updatedUser);//should not send
+    })
+    .catch(err => {
+      if (err.kind === "ObjectId") {
+        return res.status(404).send({
+          message: "user not found with id " + req._Id
+        });
+      }
+      return res.status(500).send({
+        message: "Error updating user with id " + req._Id
+      });
+    });
+});
+
+//getImageURI
+router.get("/dpImage/uri/:_Id", (req, res, next) => {
+  User.findById(req.params._Id, '-__v -password', (error, user) => {
+    if (error) {
+      return next(error);
+    } else {
+      res.status(200).send(user.imgURL.url);
     }
   });
 });
