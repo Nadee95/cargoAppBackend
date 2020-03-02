@@ -67,8 +67,8 @@ const cargoRequestValidation = data => {
     on_time: joi.date(),
 
     due_time: joi.date().required(),
-    user_location: joi.any(),
-    destination: joi.any(),
+    user_location: { lat: joi.any(), lon: joi.any(), address: joi.string() },
+    destination: { lat: joi.any(), lon: joi.any(), address: joi.string() },
     driver_id: joi.any() /// type?
   });
   return schema.validate(data);

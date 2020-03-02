@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { registerValidation, loginValidation } = require("../validation");
 const app = require("../app");
 const Driver = require("../models/driver");
+const Vehicle = require("../models/vehicle");
 //  const verify = require("./routes/verifyToken");
 
 const User = require("../models/user");
@@ -134,12 +135,29 @@ router.get("/allUsers", (req, res, next) => {
   });
 });
 
+//update user
+router.put("/update/:_id", async (req, res, next) => {
+  console.log(req.params._id);
+  User.findByIdAndUpdate(req.params._id, req.body, (err, user) => {
+    if (err) {
+      res.json({
+        success: false,
+        msg: "Fail to Update User."
+      });
+      console.log(err);
+    } else {
+      console.log(user);
+      res.status(200).send(user);
+    }
+  });
+
+});
 
 
 //get user detail
 
 router.get("/:_id", (req, res, next) => {
-  User.findById(req.params._id, '-__v -password', (error, user) => {
+  User.findById(req.params._id, '-__v -imgURL -dateRegistered -_id -role -password', (error, user) => {
     if (error) {
       return next(error);
     } else {
@@ -161,7 +179,7 @@ router.get("/allDrivers", (req, res, next) => {
 
 //add driver
 router.put("/addDriver", async (req, res, next) => {
-
+  //console.log("came ", req.body);
   User.findByIdAndUpdate(req.body._id, { role: 1 }, (err, user) => {
     if (err) {
       res.json({
@@ -170,11 +188,10 @@ router.put("/addDriver", async (req, res, next) => {
       });
       console.log(err);
     } else {
-      console.log(user);
+      //console.log("User Find", user);
+
     }
   });
-
-  console.log(req.body._id);
   if (!req.body._id) {
     return res.status(400).send({
       message: " content can not be empty"
@@ -194,9 +211,30 @@ router.put("/addDriver", async (req, res, next) => {
         msg: "Fail to register Driver."
       });
     } else {
-      res.send({ success: true, msg: "Driver registered.", newDriver }); //filtr user obj
+
     }
 
+  }, (data) => {
+    let vehicle = new Vehicle({
+      driver_id: req.body._id,
+      vehicle_no: req.body.vehicle_no,
+      max_volume: req.body.max_volume,
+      max_weight: req.body.max_weight,
+      type: req.body.type
+    });
+    Vehicle.addVehicle(vehicle, (err, addedVehicle) => {
+      if (err) {
+        res.json({
+          success: false,
+          msg: "Fail to register Vehicle try again."
+        });
+        // console.log(err);
+      } else {
+        res.send({ success: true, msg: "Driver registered.", newDriver, addedVehicle }); //filtr user obj
+      }
+    });
+
+    //console.log(data);
   });
 
 });

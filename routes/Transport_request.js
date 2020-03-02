@@ -18,12 +18,13 @@ router.post("/makeRequest", async (req, res, next) => {
     on_time: Date.now(),
     due_time: req.body.due_time,
     user_location: {
-      coordinates: [{ lat: req.body.user_location.lat }, { lon: req.body.user_location.lon }]
+      lat: req.body.user_location.lat, lon: req.body.user_location.lon, address: req.body.user_location.address
     },
     destination: {
-      coordinates: [{ lat: req.body.destination.lat }, { lon: req.body.destination.lon }]
+      lat: req.body.destination.lat, lon: req.body.destination.lon, address: req.body.destination.address
     }
   });
+
   newRequest.save((err) => {
     if (err) {
       res.json({
@@ -45,7 +46,41 @@ router.get("/allRequests", (req, res, next) => {
     if (error) {
       return next(error);
     } else {
-      res.json(requests).send();
+      res.send(requests);
+    }
+  });
+});
+
+//get requests of a perticular user added
+router.get("/getRequest/:userId", (req, res, next) => {
+  Request.find({ user_id: req.params.userId }, '-__v -destination -user_location', (error, requests) => {
+    if (error) {
+      return next(error);
+    } else {
+      res.send(requests);
+    }
+  });
+});
+
+// update req with driver_id(accept request)
+router.put("/updateRequest/:reqId", (req, res, next) => {
+  Request.findOneAndUpdate(req.params.reqId, { driver_id: req.body.driver_id }, (error, requests) => {
+    if (error) {
+      return next(error);
+    } else {
+      res.send(requests);
+    }
+  });
+});
+
+
+// delete a request
+router.delete("/deleteRequest/:reqId", (req, res, next) => {
+  Request.findByIdAndRemove(req.params.reqId, (error, requests) => {
+    if (error) {
+      return next(error);
+    } else {
+      res.send(requests);
     }
   });
 });

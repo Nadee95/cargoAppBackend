@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  imgURL: { url: String, filename: String },
+  imgURL: { url: { type: String }, filename: String },
   role: { type: Number, default: 0 },
   dateRegistered: { type: Date, default: Date.now }
 });

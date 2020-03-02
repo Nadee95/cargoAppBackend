@@ -16,11 +16,12 @@ const transport_requestSchema = mongoose.Schema({
   due_time: { type: Date, require: true },
   user_location: {
     //type: mongoose.Schema.Types.Point,
-    coordinates: [{ lat: { type: Number } }, { lon: { type: Number } }] //syntax ?
+    lat: { type: Number }, lon: { type: Number }, address: { type: String }//syntax ?
   },
   destination: {
     //type: mongoose.Schema.Types.Point,
-    coordinates: [{ lat: { type: Number } }, { lon: { type: Number } }] //syntax ?
+    // coordinates: [{ lat: { type: Number } }, { lon: { type: Number } }] //syntax ?
+    lat: { type: Number }, lon: { type: Number }, address: { type: String }//syntax ?
   },
   driver_id: ObjectId
 });

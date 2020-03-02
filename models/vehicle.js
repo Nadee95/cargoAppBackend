@@ -12,17 +12,17 @@ const vehicleSchema = mongoose.Schema({
     unique: true,
     index: true
   },
+  driver_id: ObjectId,
   type: {
     type: String,
     required: true
   },
-  photo: URL,
-  max_volume: { type: Float, required: true },
-  max_weight: { type: Float, required: true },
+  photo: String,
+  max_volume: { type: Number, required: true },
+  max_weight: { type: Number, required: true },
   cargo_service: ObjectId,
   location: {
-    type: mongoose.Schema.Types.Point,
-    coordinates: [{ lon: { type: Number } }, { lon: { type: Number } }] //syntax ?
+    lat: { type: Number }, lon: { type: Number }
   }
 });
 //cargo service ?
@@ -31,16 +31,16 @@ const Vehicle = (module.exports = mongoose.model("Vehicle", vehicleSchema));
 
 /////db functions/////
 
-module.exports.getVehicleById = function(id, callback) {
+module.exports.getVehicleById = function (id, callback) {
   Vehicle.findById(id, callback);
 };
 
-module.exports.getVehicleByVehicleNo = function(vehicle_no, callback) {
+module.exports.getVehicleByVehicleNo = function (vehicle_no, callback) {
   const query = { vehicle_no: vehicle_no };
   User.findOne(query, callback);
 };
 
-module.exports.addVehicle = function(newVehicle, callback) {
-  if (err) throw err;
-  newVehicle.save(callback);
+module.exports.addVehicle = function (newVehicle, callback) {
+
+  Vehicle.save(callback);
 };
